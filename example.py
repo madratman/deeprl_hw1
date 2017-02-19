@@ -78,10 +78,9 @@ def main():
     t1 = time.time()
     print("4*4: policy_improvement_idx {}, policy_eval_idx {}, time {} s".format(policy_improvement_idx, policy_eval_idx, t1-t0))
     total_reward, num_steps = run_random_policy(env, policy_imp)
-    # print("4*4 total_reward {}".format(total_reward))
     print('Agent received total reward of: %f' % total_reward)
     print('Agent took %d steps' % num_steps)
-    print('discounted reward')
+    print('discounted reward', total_reward*gamma_a**(num_steps-1))
     print(value_function.shape)
 
     fig = plt.figure()
@@ -123,6 +122,7 @@ def main():
     # print("8*8 total_reward {}".format(total_reward))
     print('Agent received total reward of: %f' % total_reward)
     print('Agent took %d steps' % num_steps)
+    print('discounted reward', total_reward*gamma_a**(num_steps-1))
     from matplotlib import pyplot as plt
     print(value_function.shape)
     fig = plt.figure()
@@ -176,15 +176,11 @@ def main():
 
     meta_total_reward = 0
     meta_num_steps = 0
+    cum_disc_reward = 0
     for i in range(100):
         total_reward, num_steps = run_random_policy(env, policy_from_value)
-        # print('Agent received total reward of: %f' % total_reward)
-        # print('Agent took %d steps' % num_steps)
-        meta_total_reward += total_reward
-        meta_num_steps += num_steps
-    print("meta_total_reward", meta_total_reward)
-    print("meta_num_steps", meta_num_steps)
-
+        cum_disc_reward += total_reward*(gamma_a**(num_steps-1))
+    print("4*4 cum_disc_reward", cum_disc_reward)
     print("\n\n\n\n\n\n\n\n\n")
 
 
@@ -208,14 +204,11 @@ def main():
     plt.savefig('8*8_stochastic_val_iter.png', format='png')
     policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
     rl.print_policy(policy_from_value.reshape(8,8), lake_env.action_names)
+    cum_disc_reward = 0
     for i in range(100):
         total_reward, num_steps = run_random_policy(env, policy_from_value)
-        # print('Agent received total reward of: %f' % total_reward)
-        # print('Agent took %d steps' % num_steps)
-        meta_total_reward += total_reward
-        meta_num_steps += num_steps
-    print("meta_total_reward", meta_total_reward)
-    print("meta_num_steps", meta_num_steps)
+        cum_disc_reward += total_reward*(gamma_a**(num_steps-1))
+    print("cum_disc_reward", cum_disc_reward)
 
     print("\n\n\n\n\n\n\n\n\n")
 
@@ -242,6 +235,15 @@ def main():
     total_reward, num_steps = run_random_policy(env, policy_from_value)
     print('Agent received total reward of: %f' % total_reward)
     print('Agent took %d steps' % num_steps)
+
+    import deeprl_hw1.queue_envs as env_queue
+    first = env_queue.QueueEnv(0.1,0.9,0.1)
+    print(first.nS)
+    first._reset()
+    print(first.curr_state)
+    first._step(2)
+    print(first.curr_state)
+    print(first.query_model(first.curr_state, 2))
 
 if __name__ == '__main__':
     main()

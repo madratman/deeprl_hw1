@@ -78,7 +78,7 @@
 \maketitle
 
 \begin{abstract}
- 	This document presents a method to solve the long standing problem of 10-703 HW 1.  
+This document, although sparing in writing as compared to what might be considered ideal, presents methods to solve the long standing group of problems collectively known as 10-703 HW 1. The implementation is closed source as of now but can be accessed at Gradescope. 
 \end{abstract}
 
 \section{Problem 1}
@@ -106,9 +106,15 @@
 
 \item As each action is available at all states (if the agent runs into a wall, it just stays there. Also, all actions in the end state leads to no change of agent's state), the number of all possible (deterministic) policies is $4^{36}$.
 
-\item \hl{todo}
+\item Policy:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=90mm]{policy_ann.png}
+\caption{Policy \label{overflow}}
+\end{figure}
 \item Deterministic
-\item In this case, there is no advantage of a stochastic policy. \hl{explain}
+\item In this case, there is no advantage of a stochastic policy. In general, stochastic policies help in exploration in initial stages of learning. 
  
 \end{enumerate}
 
@@ -139,7 +145,7 @@
   
 \item $V_{\pi_a}$ < $V_{\pi_b}$ as in policy b, the expected reward is equal to the reward of the terminal state, which is +10. In policy a, the agent ends up stuck in the state (1,5) as there's a wall beneath it, so it's expected reward is just -1.
 
-\item $V_{\pi_a}$ is same as $V_{\pi_b}$ will be same in the green region, as here the states are affected by the terminal positive reward received by reaching the coffee state. In the blue region, the policies won't converge to anything of interest as there is no reward signal propagating through them. So, the value functions are \hl{WTF} 
+\item $V_{\pi_a}$ is same as $V_{\pi_b}$ will be same in the green region, as here the states are affected by the terminal positive reward received by reaching the coffee state. In the blue region, the policies won't converge to anything of interest as there is no reward signal propagating through them. So, the value functions are both equal to -5 (-1 for each step) in the blue region in both cases.  
 
 \end{enumerate}
 
@@ -156,11 +162,13 @@ policy improvement steps : 15\\
 policy evaluation steps : 120 \\
 time : 0.0430150032043 seconds
 \item
+4*4
 DRDL\\
 DLDL\\
 RDDL\\
-LRRL\\\\
+LRRL
 
+8*8
 DDDDDDDD\\
 DDDRDDDD\\
 DDDLDRDD\\
@@ -168,7 +176,7 @@ RRRRDLDD\\
 RRULDDRD\\
 DLLRRDLD\\
 DLRULDLD\\
-RRULRRRL\\
+RRULRRRL
 
 \item
 Value function plots \\
@@ -188,18 +196,19 @@ Value function plots \\
 \item 
 4*4 \\
 time : 0.00160002708435s \\
-no of iterations : 7\\
+no of iterations : 7
 
 \begin{tabular}{|c|c|c|c|}\hline
 0.59033 & 0.65625 & 0.729 & 0.65625 \\\hline
 0.65625 & 0.0 & 0.81006 & 0.0 \\\hline
 0.729 & 0.81006 & 0.8999 & 0.0 \\\hline
 0.0 & 0.8999 & 1.0 & 0.0\\\hline
-\end{tabular}\\\\
+\end{tabular}
 
 8*8 \\
 time : 0.0102798938751s\\
-no of iterations : 15\\
+no of iterations : 15
+
 \begin{tabular}{|c|c|c|c|c|c|c|c|}\hline
 0.25415 & 0.28247 & 0.31372 & 0.34863 & 0.38745 & 0.43042 & 0.47827 & 0.53125 \\ \hline
 0.28247 & 0.31372 & 0.34863 & 0.38745 & 0.43042 & 0.47827 & 0.53125 & 0.59033 \\\hline
@@ -232,15 +241,12 @@ Both take same number of iterations (7 in 4*4 and 15 in 8*8) on the face of it. 
 
 \item
 No, there aren't as evident from the plots. Both methods are converging to the same optimal policy. 
-
 \item 
-
 4*4\\
-
 DRDL\\
 DLDL\\
 RDDL\\
-LRRL\\\\
+LRRL\\
 
 8*8\\
 DDDDDDDD\\
@@ -251,8 +257,18 @@ RRULDDRD\\
 DLLRRDLD\\
 DLRULDLD\\
 RRULRRRL\\
-\item
 
+\item 
+
+4*4 \\
+Discounted reward : 0.59049
+Value function : 0.59033
+
+8*8 \\
+Discounted reward : 0.25415
+Value function : 0.25415
+
+Yes, they both match in both cases
 \end{enumerate}
 
 
@@ -324,14 +340,14 @@ LLDLLLLR\\
 RDLLDDDL\\
 
 \item
-\hl{todo}
+
 Yes, the optimal policy differs as compared to the deterministic case. 
 \\
 Deterministic :\\
 DRDL\\
 DLDL\\
 RDDL\\
-LRRL\\\\
+LRRL\\
 
 Stochastic:\\
 LULU\\
@@ -339,7 +355,27 @@ LLLL\\
 UDLL\\
 LRDL\\
 
-\item
+Environment:\\
+SFFF\\
+FHFH\\
+FFFH\\
+HFFG\\
+
+Consider the tile to the left of the goal state. In the deterministic cases, the policy is go Right at this state as the agent will always end up in the goal state. 
+
+However, in the stochastic case, the policy is to go Down. This is because, if it goes down, it has a 33\% chance of going to the goal state. If it goes left by chance, the policy on that tile is to go Right, so it will end up in the tile next to the goal state again. 
+
+\item 
+
+4*4 \\
+mean cumulative discount reward over 100 steps : 0.00738
+value function : 0.06427
+
+8*8\\
+mean cumulative discount reward over 100 steps :0.00437
+value function : 0.00231
+
+Over infinite data, we can expect the mean cumulative discounted reward to match the value function, but right now it doesn't completely as we're just doing 100 episodes. 
 
 \end{enumerate}
 
@@ -348,7 +384,7 @@ LRDL\\
 \subsection{Part C}
 \begin{enumerate}[label=(\alph*)]
 
-\item 
+\item Value function plot:
 \begin{figure}[H]
 \centering
 \includegraphics[width=90mm]{4_4_neg_val_iter.png}
@@ -363,25 +399,56 @@ Yes, it is different, as is evident from the above plot
 DDLD\\
 RLLL\\
 DURL\\
-LLRL\\
+LLRL
+
+Environment:\\
+SFFF\\
+FHFH\\
+FFFH\\
+HFFG
+
+We can see that the agent is driving into the holes. 
 
 \item
-Deterministic policy:
+Positive reward policy:\\
 DRDL\\
 DLDL\\
 RDDL\\
-LRRL\\\\
-Hence, the optimal policy is indeed different
-\hl{todo explain}
+LRRL
+
+Hence, the optimal policy is indeed different as this time the agent is choosing to move towards the hole tiles as they have zero reward whereas the ones which are frozen have -1 reward. 
 
 \end{enumerate}
 
 \section{Problem 3}
+Please see the code.
 
 \section{Problem 4}
 \begin{enumerate}[label=(\alph*)]
+\item From the Contraction Mapping Theorem, we know that for any metric space $V$ that is closed under an operator $T(v)$, T converges to a unique fixed point, if T is a $\gamma$-contraction.
+Hence, we need to show that the value iteration operator is indeed a contraction:
+
+We can write the Bellman optimality backup in matrix form as:
+
+\begin{align*}
+\lVert F(u)-F(v) \rVert_{\infty} &= \lVert max_{a \in A}(R^a+\gamma P^au) - max_{a \in A}(R^a+\gamma P^av) \rVert_{\infty}\\
+&\leq  max_{a \in A}(\lVert R^a+\gamma P^au - R^a-\gamma P^av \rVert_{\infty})\\
+&\leq max_{a \in A}(\lVert\gamma P^a (u-v)\rVert_{\infty})\\
+&\leq \gamma * max_{a \in A}(P^a \lVert(u-v)\rVert_{\infty})\\
+&\leq \gamma * \lVert(u-v)\rVert_{\infty} * max_{a \in A}(P^a)\\
+&\leq \gamma \lVert u-v \rVert_{\infty}
+\end{align*}
 \item
-\item
+At each iteration, we're doing $V_{k+1}=FV_k$.\\
+Let's write the contraction mapping theorem wrt $V^k=(F^*)^kV_0$ and $V^*$ as k approaches infinity:
+\begin{align*}
+\lVert V^k- V^* \rVert_{\infty} 
+= \lVert FV^{k-1}- FV^* \rVert_{\infty} \leq \gamma \lVert V^{k-1}- V^* \rVert_{\infty} \\
+= \gamma \lVert FV^{k-2}- FV^* \rVert_{\infty}  \leq \gamma^2 \lVert V^{k-1}- V^* \rVert_{\infty} \\ ... \\
+\leq \gamma^k \lVert V^{0}- V^* \rVert_{\infty} \\  \rightarrow 0 
+\end{align*}
+as $\gamma$<1.
+
 \item \begin{align*}
   \pi ^*(s) = \argmax _{a \in A} 
     \left(
@@ -393,9 +460,5 @@ Hence, the optimal policy is indeed different
 \end{align*}
 \end{enumerate}
 
-
-
-\section*{References}
-\small
 
 \end{document}

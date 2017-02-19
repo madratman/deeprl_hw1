@@ -4,13 +4,12 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from builtins import input
-
 import deeprl_hw1.lake_envs as lake_env
 import gym
-import time
-
-
-def run_random_policy(env):
+import time, sys
+sys.path.append('deeprl_hw1')
+import rl
+def run_random_policy(env, policy):
     """Run a random policy for the given environment.
 
     Logs the total reward and the number of steps until the terminal
@@ -34,9 +33,10 @@ def run_random_policy(env):
 
     total_reward = 0
     num_steps = 0
+    nextstate = initial_state
+
     while True:
-        nextstate, reward, is_terminal, debug_info = env.step(
-            env.action_space.sample())
+        nextstate, reward, is_terminal, debug_info = env.step(policy[nextstate])
         env.render()
 
         total_reward += reward
@@ -49,10 +49,8 @@ def run_random_policy(env):
 
     return total_reward, num_steps
 
-
 def print_env_info(env):
     print('Environment has %d states and %d actions.' % (env.nS, env.nA))
-
 
 def print_model_info(env, state, action):
     transition_table_row = env.P[state][action]
@@ -67,12 +65,11 @@ def print_model_info(env, state, action):
             '\tTransitioning to %s state %d with probability %f and reward %f'
             % (state_type, nextstate, prob, reward))
 
-
 def main():
     # create the environment
-    env = gym.make('FrozenLake-v0')
+    # env = gym.make('FrozenLake-v0')
     # uncomment next line to try the deterministic version
-    # env = gym.make('Deterministic-4x4-FrozenLake-v0')
+    env = gym.make('Deterministic-4x4-FrozenLake-v0')
 
     print_env_info(env)
     print_model_info(env, 0, lake_env.DOWN)
@@ -80,8 +77,13 @@ def main():
     print_model_info(env, 14, lake_env.RIGHT)
 
     input('Hit enter to run a random policy...')
-
-    total_reward, num_steps = run_random_policy(env)
+    import numpy as np
+    policy = np.zeros(env.nS)
+    value_func = np.zeros(env.nS)
+    gamma = 0.9
+    policy_imp = rl.policy_iteration(env, gamma)
+    total_reward, num_steps = run_random_policy(env, policy_imp)
+    # total_reward, num_steps = run_random_policy(env)
     print('Agent received total reward of: %f' % total_reward)
     print('Agent took %d steps' % num_steps)
 

@@ -46,7 +46,7 @@ def evaluate_policy(env, gamma, policy, max_iterations=int(1e3), tol=1e-3):
 			for prob_state, next_state_idx, reward, _ in env.P[state_idx][action_idx]:
 				value_function[state_idx] += prob_state * (reward + gamma*value_function[next_state_idx])
 			delta = max(delta, np.absolute(v_state_curr - value_function[state_idx]))
-			print("iter_idx : {}, delta : {}".format(iter_idx, delta))
+			# print("iter_idx : {}, delta : {}".format(iter_idx, delta))
 		if delta < tol:
 			break
 	return value_function, iter_idx
@@ -158,14 +158,14 @@ def policy_iteration(env, gamma, max_iterations=int(1e3), tol=1e-3):
 
 	while (improvement_iter < max_iterations) and policy_changed:
 		value_function, eval_iter_curr = evaluate_policy(env, gamma, policy)
-		print("eval value_function ", value_function)
-		print("eval policy ", policy)
+		# print("eval value_function ", value_function)
+		# print("eval policy ", policy)
 		policy_changed, policy = improve_policy(env, gamma, value_function, policy)
-		print("improve value_function ", value_function)
-		print("improve policy ", policy)
+		# print("improve value_function ", value_function)
+		# print("improve policy ", policy)
 		policy_eval_idx += eval_iter_curr
 		improvement_iter += 1 
-		print("policy_eval_idx : {}, improvement_iter : {}, policy_stable : {}".format(policy_eval_idx, improvement_iter, policy_changed))
+		# print("policy_eval_idx : {}, improvement_iter : {}, policy_stable : {}".format(policy_eval_idx, improvement_iter, policy_changed))
 	return policy, value_function, improvement_iter, policy_eval_idx
 
 def value_iteration(env, gamma, max_iterations=int(1e3), tol=1e-3):

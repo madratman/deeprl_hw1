@@ -68,24 +68,37 @@ def main():
     # create the environment
     # env = gym.make('FrozenLake-v0')
     # uncomment next line to try the deterministic version
-    env = gym.make('Deterministic-4x4-FrozenLake-v0')
+    # env = gym.make('Deterministic-4x4-FrozenLake-v0')
+    env = gym.make('Deterministic-8x8-FrozenLake-v0')
 
-    print_env_info(env)
-    print_model_info(env, 0, lake_env.DOWN)
-    print_model_info(env, 1, lake_env.DOWN)
-    print_model_info(env, 14, lake_env.RIGHT)
+    # print_env_info(env)
+    # print_model_info(env, 0, lake_env.DOWN)
+    # print_model_info(env, 1, lake_env.DOWN)
+    # print_model_info(env, 14, lake_env.RIGHT)
 
-    input('Hit enter to run a random policy...')
+    input('Hit enter to run a policy...')
     import numpy as np
-    policy = np.zeros(env.nS, dtype='int')
-    value_func = np.zeros(env.nS)
-    gamma = 0.9
-    policy_imp, value_function, policy_improvement_idx, value_iter_idx = rl.policy_iteration(env, gamma)
-    # print(policy_imp)
+    gamma_a = 0.9
+    t0 = time.time()
+    policy_imp, value_function, policy_improvement_idx, policy_eval_idx = rl.policy_iteration(env, gamma_a)
+    # rl.print_policy(policy_imp.reshape(4,4), lake_env.action_names)
+    rl.print_policy(policy_imp.reshape(8,8), lake_env.action_names)
+    t1 = time.time()
+    print("4*4: policy_improvement_idx {}, policy_eval_idx {}, time {} s".format(policy_improvement_idx, policy_eval_idx, t1-t0))
     total_reward, num_steps = run_random_policy(env, policy_imp)
-    # total_reward, num_steps = run_random_policy(env)
-    print('Agent received total reward of: %f' % total_reward)
-    print('Agent took %d steps' % num_steps)
+
+    from matplotlib import pyplot as plt
+    print(value_function.shape)
+    # plt.imshow(value_function.reshape(4,4))
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    # res = ax.imshow(value_function.reshape(4,4), cmap=plt.cm.jet, interpolation='nearest')
+    res = ax.imshow(value_function.reshape(8,8), cmap=plt.cm.jet, interpolation='nearest')
+    fig.colorbar(res)
+    plt.savefig('4*4.png', format='png')
+    plt.savefig('8*8.png', format='png')
 
 if __name__ == '__main__':
     main()

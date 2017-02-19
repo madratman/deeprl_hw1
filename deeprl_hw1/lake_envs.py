@@ -9,7 +9,8 @@ from gym.envs.toy_text import frozen_lake, discrete
 
 from gym.envs.registration import register
 
-action_names = {LEFT: 'LEFT', RIGHT: 'RIGHT', DOWN: 'DOWN', UP: 'UP'}
+# action_names = {LEFT: 'LEFT', RIGHT: 'RIGHT', DOWN: 'DOWN', UP: 'UP'}
+action_names = {LEFT: 'L', RIGHT: 'R', DOWN: 'D', UP: 'U'}
 
 register(
     id='Deterministic-4x4-FrozenLake-v0',

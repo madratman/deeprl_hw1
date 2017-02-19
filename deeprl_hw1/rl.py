@@ -40,12 +40,13 @@ def evaluate_policy(env, gamma, policy, max_iterations=int(1e3), tol=1e-3):
 		iter_idx += 1
 		delta = 0
 		for state_idx in range(env.nS):
-			v_state_curr = 0
+			v_state_curr = value_function[state_idx]
+			value_function[state_idx] = 0
 			action_idx = policy[state_idx]
 			for prob_state, next_state_idx, reward, _ in env.P[state_idx][action_idx]:
-				v_state_curr += prob_state * (reward + gamma*value_function[next_state_idx])
-			delta = np.max(delta, np.absolute(v_state_curr - value_function[state_idx]))
-			value_function[state_idx] = v_state_curr
+				value_function[state_idx] += prob_state * (reward + gamma*value_function[next_state_idx])
+			delta = max(delta, np.absolute(v_state_curr - value_function[state_idx]))
+			print("iter_idx : {}, delta : {}".format(iter_idx, delta))
 		if delta < tol:
 			break
 	return value_function, iter_idx
@@ -75,7 +76,7 @@ def value_function_to_policy(env, gamma, value_function):
 		q_vals = np.zeros(env.nA)
 		for action_idx in range(env.nA):
 			for prob_state, next_state_idx, reward, _ in env.P[state_idx][action_idx]:
-				q_vals[new_action_idx] = prob_state * (reward + gamma*value_function[next_state_idx])			
+				q_vals[new_action_idx] += prob_state * (reward + gamma*value_function[next_state_idx])			
 		policy[state_idx] = np.argmax(q_vals)
 
 	return policy
@@ -113,14 +114,12 @@ def improve_policy(env, gamma, value_func, policy):
 		q_vals = np.zeros(env.nA)
 		for new_action_idx in range(env.nA):
 			for prob_state, next_state_idx, reward, _ in env.P[state_idx][new_action_idx]:
-				q_vals[new_action_idx] = prob_state * (reward + gamma*value_func[next_state_idx])			
-		value_func[state_idx] = np.argmax(q_vals)
+				q_vals[new_action_idx] += prob_state * (reward + gamma*value_func[next_state_idx])			
+		policy[state_idx] = np.argmax(q_vals)
 
 		if old_action_idx != policy[state_idx]:
 			policy_stable = False
-
 	return not(policy_stable), policy
-
 
 def policy_iteration(env, gamma, max_iterations=int(1e3), tol=1e-3):
 	"""Runs policy iteration.
@@ -151,18 +150,23 @@ def policy_iteration(env, gamma, max_iterations=int(1e3), tol=1e-3):
 	   Returns optimal policy, value function, number of policy
 	   improvement iterations, and number of value iterations.
 	"""
-	policy_stable = False
-	value_iter_idx = 0
-	policy_improvement_idx = 0
+	policy_changed = True
+	policy_eval_idx = 0
+	improvement_iter = 0
 	value_function = np.zeros(env.nS)
 	policy = np.zeros(env.nS, dtype='int')
-	while (policy_improvement_idx<max_iterations) or not policy_stable:
-		value_function, value_iter_curr = evaluate_policy(env, gamma, policy)
-		policy_stable, policy = improve_policy(env, gamma, value_function, policy)
-		value_iter_idx += value_iter_curr
-		policy_improvement_idx += 1 
 
-	return policy, value_func, policy_improvement_idx, value_iter_idx
+	while (improvement_iter < max_iterations) and policy_changed:
+		value_function, eval_iter_curr = evaluate_policy(env, gamma, policy)
+		print("eval value_function ", value_function)
+		print("eval policy ", policy)
+		policy_changed, policy = improve_policy(env, gamma, value_function, policy)
+		print("improve value_function ", value_function)
+		print("improve policy ", policy)
+		policy_eval_idx += eval_iter_curr
+		improvement_iter += 1 
+		print("policy_eval_idx : {}, improvement_iter : {}, policy_stable : {}".format(policy_eval_idx, improvement_iter, policy_changed))
+	return policy, value_function, improvement_iter, policy_eval_idx
 
 def value_iteration(env, gamma, max_iterations=int(1e3), tol=1e-3):
 	"""Runs value iteration for a given gamma and environment.
@@ -198,10 +202,10 @@ def value_iteration(env, gamma, max_iterations=int(1e3), tol=1e-3):
 			q_vals = np.zeros(env.nA)
 			v_state_curr = value_function[state_idx]
 			for new_action_idx in range(env.nA):
-				for prob_state, next_state_idx, reward, _ in env.P[state_idx][action_idx]:
-					q_vals[new_action_idx] = prob_state * (reward + gamma*value_function[next_state_idx])
+				for prob_state, next_state_idx, reward, _ in env.P[state_idx][new_action_idx]:
+					q_vals[new_action_idx] += prob_state * (reward + gamma*value_function[next_state_idx])
 			value_function[state_idx] = np.max(q_vals[new_action_idx])
-		delta = np.max(delta, np.absolute(v_state_curr - value_function[s]))
+		delta = max(delta, np.absolute(v_state_curr - value_function[s]))
 		if delta < tol:
 			break
 	return value_function, iter_idx

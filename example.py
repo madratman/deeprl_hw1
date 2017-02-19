@@ -34,10 +34,9 @@ def run_random_policy(env, policy):
     total_reward = 0
     num_steps = 0
     nextstate = initial_state
-
     while True:
         nextstate, reward, is_terminal, debug_info = env.step(policy[nextstate])
-        env.render()
+        # env.render()
 
         total_reward += reward
         num_steps += 1
@@ -45,7 +44,7 @@ def run_random_policy(env, policy):
         if is_terminal:
             break
 
-        time.sleep(1)
+        # time.sleep(1)
 
     return total_reward, num_steps
 
@@ -78,15 +77,15 @@ def main():
 
     input('Hit enter to run a random policy...')
     import numpy as np
-    policy = np.zeros(env.nS)
+    policy = np.zeros(env.nS, dtype='int')
     value_func = np.zeros(env.nS)
     gamma = 0.9
-    policy_imp = rl.policy_iteration(env, gamma)
+    policy_imp, value_function, policy_improvement_idx, value_iter_idx = rl.policy_iteration(env, gamma)
+    # print(policy_imp)
     total_reward, num_steps = run_random_policy(env, policy_imp)
     # total_reward, num_steps = run_random_policy(env)
     print('Agent received total reward of: %f' % total_reward)
     print('Agent took %d steps' % num_steps)
-
 
 if __name__ == '__main__':
     main()

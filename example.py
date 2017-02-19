@@ -8,7 +8,9 @@ import deeprl_hw1.lake_envs as lake_env
 import gym
 import time, sys
 sys.path.append('deeprl_hw1')
+import numpy as np
 import rl
+
 def run_random_policy(env, policy):
     """Run a random policy for the given environment.
 
@@ -65,40 +67,159 @@ def print_model_info(env, state, action):
             % (state_type, nextstate, prob, reward))
 
 def main():
-    # create the environment
-    # env = gym.make('FrozenLake-v0')
-    # uncomment next line to try the deterministic version
-    # env = gym.make('Deterministic-4x4-FrozenLake-v0')
-    env = gym.make('Deterministic-8x8-FrozenLake-v0')
+    from matplotlib import pyplot as plt
 
-    # print_env_info(env)
-    # print_model_info(env, 0, lake_env.DOWN)
-    # print_model_info(env, 1, lake_env.DOWN)
-    # print_model_info(env, 14, lake_env.RIGHT)
+    # env_dict = {1:'Deterministic-4x4-FrozenLake-v0', 2:'Deterministic-8x8-FrozenLake-v0'}
 
-    input('Hit enter to run a policy...')
-    import numpy as np
+    env = gym.make('Deterministic-4x4-FrozenLake-v0')
     gamma_a = 0.9
     t0 = time.time()
     policy_imp, value_function, policy_improvement_idx, policy_eval_idx = rl.policy_iteration(env, gamma_a)
-    # rl.print_policy(policy_imp.reshape(4,4), lake_env.action_names)
-    rl.print_policy(policy_imp.reshape(8,8), lake_env.action_names)
+    rl.print_policy(policy_imp.reshape(4,4), lake_env.action_names)
     t1 = time.time()
     print("4*4: policy_improvement_idx {}, policy_eval_idx {}, time {} s".format(policy_improvement_idx, policy_eval_idx, t1-t0))
     total_reward, num_steps = run_random_policy(env, policy_imp)
-
-    from matplotlib import pyplot as plt
+    # print("4*4 total_reward {}".format(total_reward))
+    print('Agent received total reward of: %f' % total_reward)
+    print('Agent took %d steps' % num_steps)
     print(value_function.shape)
-    # plt.imshow(value_function.reshape(4,4))
+
     fig = plt.figure()
     plt.clf()
     ax = fig.add_subplot(111)
     ax.set_aspect(1)
-    # res = ax.imshow(value_function.reshape(4,4), cmap=plt.cm.jet, interpolation='nearest')
-    res = ax.imshow(value_function.reshape(8,8), cmap=plt.cm.jet, interpolation='nearest')
+    res = ax.imshow(value_function.reshape(4,4), cmap=plt.cm.jet, interpolation='nearest')
     fig.colorbar(res)
     plt.savefig('4*4.png', format='png')
+
+    t0 = time.time()
+    value_function, iter_idx =  rl.value_iteration(env, gamma_a)
+    t1 = time.time()
+    print("time :{}, iter_idx {} ".format(t1-t0, iter_idx))
+    value_function_print = np.asarray(value_function)
+    value_function_print = value_function_print.reshape(4,4).astype(np.float16)
+    np.set_printoptions(precision=4)
+    print(" \\\\\n".join([" & ".join(map(str,line)) for line in value_function_print]))
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    res = ax.imshow(value_function.reshape(4,4), cmap=plt.cm.jet, interpolation='nearest')
+    fig.colorbar(res)
+    plt.savefig('4*4_val_iter.png', format='png')
+    policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
+    rl.print_policy(policy_from_value.reshape(4,4), lake_env.action_names)
+    print("\n\n\n\n\n\n\n\n\n")
+
+################################### part b ###################################
+    env = gym.make('Deterministic-8x8-FrozenLake-v0')
+    gamma_a = 0.9
+    t0 = time.time()
+    policy_imp, value_function, policy_improvement_idx, policy_eval_idx = rl.policy_iteration(env, gamma_a)
+    rl.print_policy(policy_imp.reshape(8,8), lake_env.action_names)
+    t1 = time.time()
+    print("8*8: policy_improvement_idx {}, policy_eval_idx {}, time {} s".format(policy_improvement_idx, policy_eval_idx, t1-t0))
+    total_reward, num_steps = run_random_policy(env, policy_imp)
+    # print("8*8 total_reward {}".format(total_reward))
+    print('Agent received total reward of: %f' % total_reward)
+    print('Agent took %d steps' % num_steps)
+    from matplotlib import pyplot as plt
+    print(value_function.shape)
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    res = ax.imshow(value_function.reshape(8,8), cmap=plt.cm.jet, interpolation='nearest')
+    fig.colorbar(res)
     plt.savefig('8*8.png', format='png')
+
+    t0 = time.time()
+    value_function, iter_idx =  rl.value_iteration(env, gamma_a)
+    t1 = time.time()
+    print("time :{}, iter_idx {} ".format(t1-t0, iter_idx))
+    value_function_print = np.asarray(value_function)
+    value_function_print = value_function_print.reshape(8,8).astype(np.float16)
+    np.set_printoptions(precision=4)
+    print(" \\\\\n".join([" & ".join(map(str,line)) for line in value_function_print]))
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    res = ax.imshow(value_function.reshape(8,8), cmap=plt.cm.jet, interpolation='nearest')
+    fig.colorbar(res)
+    plt.savefig('8*8_val_iter.png', format='png')
+    policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
+    rl.print_policy(policy_from_value.reshape(8,8), lake_env.action_names)
+
+    print("\n\n\n\n\n\n\n\n\n")
+
+    env = gym.make('Stochastic-4x4-FrozenLake-v0')
+    gamma_a = 0.9
+
+    t0 = time.time()
+    value_function, iter_idx =  rl.value_iteration(env, gamma_a)
+    t1 = time.time()
+    print("time :{}, iter_idx {} ".format(t1-t0, iter_idx))
+    value_function_print = np.asarray(value_function)
+    value_function_print = value_function_print.reshape(4,4).astype(np.float16)
+    np.set_printoptions(precision=4)
+    print(" \\\\\n".join([" & ".join(map(str,line)) for line in value_function_print]))
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    res = ax.imshow(value_function.reshape(4,4), cmap=plt.cm.jet, interpolation='nearest')
+    fig.colorbar(res)
+    plt.savefig('4*4_stochastic_val_iter.png', format='png')
+    policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
+    rl.print_policy(policy_from_value.reshape(4,4), lake_env.action_names)
+
+    print("\n\n\n\n\n\n\n\n\n")
+
+
+    env = gym.make('Stochastic-8x8-FrozenLake-v0')
+    gamma_a = 0.9
+
+    t0 = time.time()
+    value_function, iter_idx =  rl.value_iteration(env, gamma_a)
+    t1 = time.time()
+    print("time :{}, iter_idx {} ".format(t1-t0, iter_idx))
+    value_function_print = np.asarray(value_function)
+    value_function_print = value_function_print.reshape(8,8).astype(np.float16)
+    np.set_printoptions(precision=4)
+    print(" \\\\\n".join([" & ".join(map(str,line)) for line in value_function_print]))
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    res = ax.imshow(value_function.reshape(8,8), cmap=plt.cm.jet, interpolation='nearest')
+    fig.colorbar(res)
+    plt.savefig('8*8_stochastic_val_iter.png', format='png')
+    policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
+    rl.print_policy(policy_from_value.reshape(8,8), lake_env.action_names)
+
+    print("\n\n\n\n\n\n\n\n\n")
+
+    env = gym.make('Deterministic-4x4-neg-reward-FrozenLake-v0')
+    gamma_a = 0.9
+    t0 = time.time()
+    value_function, iter_idx =  rl.value_iteration(env, gamma_a)
+    t1 = time.time()
+    print("time :{}, iter_idx {} ".format(t1-t0, iter_idx))
+    value_function_print = np.asarray(value_function)
+    value_function_print = value_function_print.reshape(4,4).astype(np.float16)
+    np.set_printoptions(precision=4)
+    print(" \\\\\n".join([" & ".join(map(str,line)) for line in value_function_print]))
+    fig = plt.figure()
+    plt.clf()
+    ax = fig.add_subplot(111)
+    ax.set_aspect(1)
+    res = ax.imshow(value_function.reshape(4,4), cmap=plt.cm.jet, interpolation='nearest')
+    fig.colorbar(res)
+    plt.savefig('4*4_neg_val_iter.png', format='png')
+
+    policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
+    rl.print_policy(policy_from_value.reshape(4,4), lake_env.action_names)
 
 if __name__ == '__main__':
     main()

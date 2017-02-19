@@ -30,8 +30,8 @@ def run_random_policy(env, policy):
       episode finished.
     """
     initial_state = env.reset()
-    env.render()
-    time.sleep(1)  # just pauses so you can see the output
+    # env.render()
+    # time.sleep(1)  # just pauses so you can see the output
 
     total_reward = 0
     num_steps = 0
@@ -42,7 +42,6 @@ def run_random_policy(env, policy):
 
         total_reward += reward
         num_steps += 1
-
         if is_terminal:
             break
 
@@ -82,6 +81,7 @@ def main():
     # print("4*4 total_reward {}".format(total_reward))
     print('Agent received total reward of: %f' % total_reward)
     print('Agent took %d steps' % num_steps)
+    print('discounted reward')
     print(value_function.shape)
 
     fig = plt.figure()
@@ -174,6 +174,17 @@ def main():
     policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
     rl.print_policy(policy_from_value.reshape(4,4), lake_env.action_names)
 
+    meta_total_reward = 0
+    meta_num_steps = 0
+    for i in range(100):
+        total_reward, num_steps = run_random_policy(env, policy_from_value)
+        # print('Agent received total reward of: %f' % total_reward)
+        # print('Agent took %d steps' % num_steps)
+        meta_total_reward += total_reward
+        meta_num_steps += num_steps
+    print("meta_total_reward", meta_total_reward)
+    print("meta_num_steps", meta_num_steps)
+
     print("\n\n\n\n\n\n\n\n\n")
 
 
@@ -197,6 +208,14 @@ def main():
     plt.savefig('8*8_stochastic_val_iter.png', format='png')
     policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
     rl.print_policy(policy_from_value.reshape(8,8), lake_env.action_names)
+    for i in range(100):
+        total_reward, num_steps = run_random_policy(env, policy_from_value)
+        # print('Agent received total reward of: %f' % total_reward)
+        # print('Agent took %d steps' % num_steps)
+        meta_total_reward += total_reward
+        meta_num_steps += num_steps
+    print("meta_total_reward", meta_total_reward)
+    print("meta_num_steps", meta_num_steps)
 
     print("\n\n\n\n\n\n\n\n\n")
 
@@ -220,6 +239,9 @@ def main():
 
     policy_from_value = rl.value_function_to_policy(env, gamma_a, value_function)
     rl.print_policy(policy_from_value.reshape(4,4), lake_env.action_names)
+    total_reward, num_steps = run_random_policy(env, policy_from_value)
+    print('Agent received total reward of: %f' % total_reward)
+    print('Agent took %d steps' % num_steps)
 
 if __name__ == '__main__':
     main()
